@@ -13,7 +13,7 @@ You surely already got stuck in a tty needing to copy & paste something, but the
 (you'll surely need to do these actions as root, just preceed all the commands with `sudo`)
 
 ```bash
-wget https://raw.githubusercontent.com/lapingenieur/cclip/master/cclip -O /usr/local/bin/cclip
+wget https://raw.githubusercontent.com/lapingenieur/cclip/master/cclip -O /usr/local/bin/cclip -nv
 chmod a+x /usr/local/bin/cclip
 ```
 
