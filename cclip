@@ -1,0 +1,165 @@
+#!/bin/bash
+# 
+# cclip - the console clipboard
+# 
+# written by lapingenieur using neovim (<= best editor! :D)
+# hosted over github.com/lapingenieur/cclip
+# contact: lapingenieur@gmail.com
+
+version=2.2
+
+error(){
+    echo "ERR: $2" >> /dev/stderr
+    exit $1
+}
+
+version(){
+    echo -e "cclip - the console clipboard\nversion: v$version"
+    test "$1" != 1 && exit 0
+}
+
+tuto(){
+    version 1
+    cat << EOF
+NOTE: for more help, look at 'cclip -h'
+short tutorial:
+- I wanna copy a command's output but I'm in the tty/don't
+  have a working clipboard, just execute:
+    <your command> | cclip
+  => will redirect <your command>'s standard into cclip's
+    clipboard (file: see below)
+- I wanna get back the value I saved with cclip, just use:
+    cclip -o
+  => will print out stored value of cclip's clipboard
+  => you can add redirection/piping to use it elsewhere:
+    cclip -o | <your command>
+    cclip -o >> <your file>
+  => will pipe(give) the stored value to <your command> or
+    output its content to <your file> (at the end of file,
+    look at file redirection)
+- I wanna save a certain string, just execute :
+    cclip -s <your string>
+  => will save <your string> in cclip's clipboard
+- I wanna delete the clipboard's content, just use :
+    cclip -d
+  => will reset the cclip clipboard to be void (contains
+    "") (doesn't delete the file)
+faq: why to use cclip?
+  you surely already got stuck in a tty needing to copy &
+  paste something, but there's no clipboard in ttys; cclip
+  is a kinda clipboard that works with tty as well as with
+  graphical environments (needs a CLI)
+----- [exiting]
+EOF
+    exit 0
+}
+
+helpy(){
+    version 1
+    cat << EOF
+usage:
+  cclip [ARG]...
+ARG is an argument, can be:
+ -i, --input    : set mode to input
+ -o, --output   : set mode to output
+ -s, --string STR : set mode to copy (STR is needed)
+ -d, --delete   : reset the clipboard (to void "")
+ -h, --help     : print this help
+ -e, --status   : get error/exit status list
+ -t, --tutorial : a short tutorial and faq
+ -f, --faq      : ^- same
+ -v, --version  : print version
+modes: (by default: input)
+  input  : copies stdin to cclip clipboard
+  output : prints cclip clipboard content to stdout
+  copy   : copies following argument to cclip clipboard
+  delete : resets the content of the clipboard (to void)
+short tutorial and faq:
+  look at 'cclip -t'
+the clipboard is stored in the /tmp/cclip file as raw data
+you can also access it with usual editors/commands
+-----
+NOTE: only the last specified mode is used
+NOTE: ARG must contain one argument ('-hv' is wrong)
+  this means you must separate them (like '-h -v')
+NOTE: a more complete (and ultra-bloated) distribution of
+  this script exists, called bclip (bloated cclip): it
+  contains much more buffers, can separate user clipboards
+  or make them accessible by every one but is also pretty
+  instable and yet not finished (and is very *very* slow)
+-----
+written by lapingenieur using neovim (<= best editor! :D)
+hosted over github.com/lapingenieur/cclip
+contact: lapingenieur@gmail.com
+----- [exiting]
+EOF
+    exit 0
+}
+
+status-codes(){
+    version 1
+    cat << EOF
+exit status:
+  0: everything fine, operation succeeded
+  1: got wrong argument
+  2: intern error
+  3: failed to save the clipboard
+  4: failed to read the clipboard
+  5: needs another argument
+----- [exiting]
+EOF
+    exit 0
+}
+
+mode="i"
+
+until test $# = 0
+do
+    case "$1" in
+        "-d" | "--delete" ) mode="d" ;;
+        "-i" | "--input" ) mode="i" ;;
+        "-o" | "--output" ) mode="o" ;;
+        "-s" | "--string" ) mode="c" 
+            if test "$2"
+            then
+                content="$2"
+                test $# != 0 && shift
+            else
+                error 5 "needs something to copy after '$1'"
+            fi
+            ;;
+        "-h" | "--help" ) helpy ;;
+        "-e" | "--error" | "--status" ) status-codes ;;
+        "-t" | "--tutorial" | "-f" | "--faq" ) tuto ;;
+        "-v" | "--version" ) version ;;
+        *) error 1 "wrong argument : '$1'" ;;
+    esac
+    test $# != 0 && shift
+done
+
+case "$mode" in
+    "d" ) if ! echo -n "" > /tmp/cclip
+        then
+            error 3 "failed to save the clipboard"
+        fi
+        echo "Successfully reset the clipboard"
+        ;;
+    "i" ) if ! cat > /tmp/cclip
+        then
+            error 3 "failed to save the clipboard"
+        fi
+        echo "Successfully saved to cclip clipboard"
+        ;;
+    "o" ) if ! cat /tmp/cclip
+        then
+            error 4 "failed to read the clipboard"
+        fi
+        ;;
+    "c" ) if ! echo "$content" > /tmp/cclip
+        then
+            error 3 "failed to save the clipboard"
+        fi
+        echo "Successfully saved to cclip clipboard"
+        ;;
+    * ) error 2 "intern error : wrong mode '$mode'" ;;
+esac
