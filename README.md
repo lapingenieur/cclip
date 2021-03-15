@@ -22,7 +22,7 @@ chmod a+x /usr/local/bin/cclip
 ### To copy from stdin (standard in)
 
 ```bash
-&lt;your command> | cclip
+<your command> | cclip
 ```
 
 This will redirect `<your command>`'s  output into cclip's clipboard.
