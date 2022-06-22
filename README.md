@@ -36,8 +36,8 @@ cclip -o
 This will print out value stored in cclip's clipboard. You can add redirection/piping to use it elsewhere:
 
 ```bash
-cclip -o | &lt;your command>
-cclip -o >> &lt;your file>
+cclip -o | <your command>
+cclip -o >> <your file>
 ```
 
 This will pipe (give) the stored value to `<your command>` or output its content to `<your file>`
@@ -46,7 +46,7 @@ This will pipe (give) the stored value to `<your command>` or output its content
 ### To copy a given string
 
 ```bash
-cclip -s &lt;your string>
+cclip -s <your string>
 ```
 
 This will save `<your string>` in cclip's clipboard.
@@ -65,7 +65,7 @@ It stores its clipboard in `/tmp/cclip`. As this file is in `/tmp` :
 
 * every user can access it
 * it is deleted at every reboot
-* it is often loaded in the ram (tmp is usually mounted as a ramfs partition)
+* it is stored by default in the ram (tmp is usually mounted as a ramfs partition)
 
 ---
 
